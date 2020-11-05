@@ -5,11 +5,11 @@ import com.apiturns.demo.entity.User;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class Conexion {
+public class UserDao {
     String DB;
     String cadenaDeConexion;
 
-    public Conexion() {
+    public UserDao() {
         DB = "dbappturns";
         cadenaDeConexion = "jdbc:mysql://localhost:3306/" + DB + "?user=root&password=root&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
     }
@@ -141,6 +141,28 @@ public class Conexion {
         try (Statement cmd = con.createStatement()) {
             cmd.executeUpdate("DELETE FROM users WHERE user_id="+id);
         }
+            con.close();
+            return true;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateUser (@org.jetbrains.annotations.NotNull User user){
+        try {
+            Connection con;
+            con = DriverManager.getConnection(cadenaDeConexion);
+            try (Statement cmd = con.createStatement()) {
+
+                cmd.executeUpdate("UPDATE users SET "
+                        + "name=' " + user.getName()
+                        + "',lastname='" + user.getLastname()
+                        + "',pass='" + user.getPass()
+                        + "',dni=" + user.getDni()
+                        + ",type_user_id=" + user.getType_user_id()+" WHERE user_id="+user.getUser_id());
+
+            }
             con.close();
             return true;
         } catch (SQLException throwables) {

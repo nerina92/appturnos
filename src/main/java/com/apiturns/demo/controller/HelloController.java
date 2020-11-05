@@ -1,6 +1,6 @@
 package com.apiturns.demo.controller;
 
-import com.apiturns.demo.conexionDB.Conexion;
+import com.apiturns.demo.conexionDB.UserDao;
 import com.apiturns.demo.entity.User;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,13 +8,17 @@ import java.util.ArrayList;
 
 @RestController
 public class HelloController {
+
+    UserDao con = new UserDao();
+
     @GetMapping("/hello")
     public String sayHello(@RequestParam(value = "myName", defaultValue = "World") String name) {
         return String.format("Hello %s!", name);
     }
-    @GetMapping("/hello/user")
+
+    @GetMapping("/user")
     public String sayHelloUser(@RequestParam(value = "id", defaultValue = "0") int id) {
-        Conexion con = new Conexion();
+
         //si no pasan ningun parámetro se devuelven todos los usuarios
         if(id==0){
             String userslist="";
@@ -30,7 +34,7 @@ public class HelloController {
     }
 
     /*Este método se hará cuando por una petición POST (como indica la anotación) se llame a la url
-	http://127.0.0.1:8080/hello/user/
+	http://127.0.0.1:8080/user/
 	Header: Content-Type = application/JSON
 	body (raw, JSON) : ejemplo de obeto:
 	{
@@ -42,29 +46,25 @@ public class HelloController {
         "type_user_id":2
     }
 	*/
-    @PostMapping("/hello/user")
+    @PostMapping("/user")
     public boolean addUser(@RequestBody User user) {
-        Conexion con = new Conexion();
+
         return con.insertUser(user);
     }
 
     /*Este método se hará cuando por una petición PUT (como indica la anotación) se llame a la url
-    http://127.0.0.1:8080/api/users/
-    @PutMapping("/users")
-    public User updateUser(@RequestBody User user) {
-
-        userService.save(user);
-
+    http://127.0.0.1:8080/user*/
+    @PutMapping("/user")
+    public boolean updateUser(@RequestBody User user) {
         //este metodo actualizará al usuario enviado
-
-        return user;
-    }*/
+        return con.updateUser(user);
+    }
 
     /*Este método se hará cuando por una petición DELETE (como indica la anotación) se llame a la url + id del usuario
-    http://127.0.0.1:8080/hello/user/1*/
-    @DeleteMapping("hello/user/{userId}")
+    http://127.0.0.1:8080/user/1*/
+    @DeleteMapping("user/{userId}")
     public String deteteUser(@PathVariable int userId) {
-        Conexion con = new Conexion();
+
         User user = con.getUser(userId);
 
         if(user == null) {
@@ -78,10 +78,10 @@ public class HelloController {
     }
 
     /*Este método se hará cuando por una petición GET (como indica la anotación) se llame a la url + email y pass del
-    usuario para comprobar el login, url: http://127.0.0.1:8080/hello/user/login?email=algo@algo.com&pass=elpassingresado*/
-    @GetMapping("/hello/user/login")
+    usuario para comprobar el login, url: http://127.0.0.1:8080/user/login?email=algo@algo.com&pass=elpassingresado*/
+    @GetMapping("/user/login")
     public boolean sayHello(@RequestParam(value = "email", defaultValue = "") String email,@RequestParam(value = "pass", defaultValue = "") String pass) {
-        Conexion con = new Conexion();
+        UserDao con = new UserDao();
         User user = con.getUser(email);
         if(user == null) {
             return false;
